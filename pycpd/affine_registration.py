@@ -45,7 +45,7 @@ class AffineRegistration(EMRegistration):
         """
 
         # source and target point cloud means
-        muX = np.divide(np.sum(np.dot(self.P, self.X), axis=0), self.Np)
+        muX = np.divide(np.sum(self.PX, axis=0), self.Np)
         muY = np.divide(
             np.sum(np.dot(np.transpose(self.P), self.Y), axis=0), self.Np)
 

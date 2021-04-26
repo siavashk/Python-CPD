@@ -64,7 +64,7 @@ class RigidRegistration(EMRegistration):
         """
 
         # target point cloud mean
-        muX = np.divide(np.sum(np.dot(self.P, self.X), axis=0),
+        muX = np.divide(np.sum(self.PX, axis=0),
                         self.Np)
         # source point cloud mean
         muY = np.divide(

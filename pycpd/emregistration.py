@@ -11,6 +11,20 @@ def initialize_sigma2(X, Y):
     err = diff ** 2
     return np.sum(err) / (D * M * N)
 
+def lowrankQS(G, beta, num_eig, eig_fgt=False):
+    # if we do not use FGT we construct affinity matrix G and find the
+    # first eigenvectors/values directly
+
+    if eig_fgt is False:
+        S, Q = np.linalg.eigh(G)
+        eig_indices = list(np.argsort(np.abs(S))[::-1][:num_eig])
+        Q = Q[:, eig_indices]  # eigenvectors
+        S = S[eig_indices]  # eigenvalues.
+
+        return Q, S
+
+    elif eig_fgt is True:
+        raise Exception('Fast Gauss Transform Not Implemented!')
 
 class EMRegistration(object):
     """
@@ -126,6 +140,7 @@ class EMRegistration(object):
         self.P = np.zeros((self.M, self.N))
         self.Pt1 = np.zeros((self.N, ))
         self.P1 = np.zeros((self.M, ))
+        self.PX = np.zeros((self.M, self.D))
         self.Np = 0
 
     def register(self, callback=lambda **kwargs: None):
@@ -177,6 +192,7 @@ class EMRegistration(object):
         self.Pt1 = np.sum(self.P, axis=0)
         self.P1 = np.sum(self.P, axis=1)
         self.Np = np.sum(self.P1)
+        self.PX = np.matmul(self.P, self.X)
 
     def maximization(self):
         self.update_transform()
