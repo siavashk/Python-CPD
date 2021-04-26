@@ -161,17 +161,12 @@ class EMRegistration(object):
         self.iteration += 1
 
     def expectation(self):
-        P = np.sum((self.X[None, :, :] - self.TY[:, None, :]) ** 2, axis=2)
+        P = np.sum((self.X[None, :, :] - self.TY[:, None, :])**2, axis=2) # (M, N)
+        P = np.exp(-P/(2*self.sigma2))
+        c = (2*np.pi*self.sigma2)**(self.D/2)*self.w/(1. - self.w)*self.M/self.N
 
-        c = (2 * np.pi * self.sigma2) ** (self.D / 2)
-        c = c * self.w / (1 - self.w)
-        c = c * self.M / self.N
-
-        P = np.exp(-P / (2 * self.sigma2))
-        den = np.sum(P, axis=0)
-        den = np.tile(den, (self.M, 1))
-        den[den == 0] = np.finfo(float).eps
-        den += c
+        den = np.sum(P, axis = 0, keepdims = True) # (1, N)
+        den = np.clip(den, np.finfo(self.X.dtype).eps, None) + c
 
         self.P = np.divide(P, den)
         self.Pt1 = np.sum(self.P, axis=0)
